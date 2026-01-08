@@ -7,11 +7,21 @@ This directory contains the test suite for the SIAR Client library.
 ```
 tests/
   ├── mocks/
-  │   ├── mock-responses.ts   # Mock API responses
-  │   └── sample-params.ts    # Sample request parameters
-  └── unit/
-      └── DataPetitionService.tests.ts  # Unit tests for DataPetitionService
+  │   ├── mock-responses.ts            # Mock API responses used across suites
+  │   └── sample-params.ts             # Sample request parameters for data calls
+  ├── unit/
+  │   ├── InformationService.test.js   # Unit tests for information endpoints
+  │   └── PetitionService.test.js       # Unit tests for data petition endpoints
+  ├── integration/
+  │   ├── DataService.integration.test.js        # Service-level mapping for data endpoints
+  │   └── InformationService.integration.test.js # Service-level mapping for info endpoints
+  └── e2e/
+      └── SIARClient.test.ts           # End-to-end test hitting live SIAR API
 ```
+
+## Environment requirements
+
+- End-to-end tests require a valid `SIAR_API_KEY` environment variable. Set it before running `tests/e2e/SIARClient.test.ts` so live requests authenticate correctly.
 
 ## Running Tests
 
@@ -34,7 +44,6 @@ The test suite covers:
 - **URL Construction**: Proper URL building with all parameters
 - **HTTP Methods**: All data retrieval methods (hourly, daily, weekly, monthly, encoded)
 - **Parameter Handling**: Single/multiple IDs, optional parameters, special characters
-- **Error Handling**: Network errors, HTTP errors (401, 404, 500), JSON parsing errors
 - **Response Parsing**: Successful responses, empty data, messages
 - **Generic Method**: Type-safe generic data retrieval
 

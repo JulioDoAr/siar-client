@@ -118,7 +118,8 @@ export class DataPetitionService {
         };
       }
 
-      const data: RespuestaGeneral<T> = await response.json();
+      const data: RespuestaGeneral<T> =
+        (await response.json()) as RespuestaGeneral<T>;
       return data;
     } catch (error) {
       return {
