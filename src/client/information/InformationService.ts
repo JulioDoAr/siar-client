@@ -74,8 +74,8 @@ export class InformationService {
         };
       }
 
-      const data: { Datos?: T; MensajeRespuesta: string | null } =
-        await response.json();
+      const data: RespuestaGeneral<T> =
+        (await response.json()) as RespuestaGeneral<T>;
       return data;
     } catch (error) {
       return {
