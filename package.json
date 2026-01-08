@@ -1,0 +1,22 @@
+{
+  "name": "siar-client",
+  "version": "0.0.1",
+  "description": "A client for SIAR system",
+  "license": "ISC",
+  "author": "Julio Domínguez Arjona",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --watch",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --coverage"
+  },
+  "devDependencies": {
+    "@jest/globals": "^30.2.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.10.5",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.9.3"
+  }
+}
