@@ -16,6 +16,7 @@ describe("SIARClient", () => {
 
   beforeAll(() => {
     const apiKey = process.env.SIAR_API_KEY;
+    // const apiKey = "-iq1hWbAy2ueUHm_JJTtDBfVyy9TekPm6uZr4N_EHO_o6_dy-j";
     if (!apiKey) {
       throw new Error("SIAR_API_KEY not set");
     }
@@ -32,6 +33,7 @@ describe("SIARClient", () => {
         communities.message
       );
     }
+    expect(communities.message).toBeNull();
   });
 
   it("should fetch real provinces", async () => {
@@ -44,6 +46,7 @@ describe("SIARClient", () => {
         provinces.message
       );
     }
+    expect(provinces.message).toBeNull();
   });
 
   it("should fetch real stations", async () => {
@@ -56,9 +59,11 @@ describe("SIARClient", () => {
         stations.message
       );
     }
+    expect(stations.message).toBeNull();
   });
 
   it("should fetch real hourly data", async () => {
+    stations = await service.fetchStations();
     // This test runs after the previous one, so stations is populated
     expect(stations.data).toBeDefined();
     if (!stations.data || stations.data.length === 0) {
