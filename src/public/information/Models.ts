@@ -1,11 +1,11 @@
 /**
- * Tipos de información disponibles en la API SIAR
+ * Available information types in the SIAR API
  */
-export enum TipoInformacion {
-  CCAA = "CCAA",
-  Provincias = "Provincias",
-  Estaciones = "Estaciones",
-  Accesos = "Accesos",
+export enum InformationCategory {
+  AutonomousCommunity = "CCAA",
+  Province = "Provincias",
+  Station = "Estaciones",
+  Access = "Accesos",
 }
 
 /**

@@ -12,7 +12,7 @@ import {
   mapInformacionAccesos,
 } from "../../mappers/Mappers.js";
 import {
-  TipoInformacion,
+  InformationCategory,
   type AutonomousCommunity,
   type Province,
   type Station,
@@ -38,22 +38,23 @@ export class InformationService {
 
   /**
    * Construye la URL completa para una petición de información
-   * @param tipoInformacion Tipo de información a solicitar
+   * @param informationCategory Tipo de información a solicitar
    * @returns URL completa para la petición
    */
-  private buildUrl(tipoInformacion: TipoInformacion): string {
-    return `${this.baseUrl}/${tipoInformacion}?ClaveAPI=${this.apiKey}`;
+  private buildUrl(informationCategory: InformationCategory): string {
+    return `${this.baseUrl}/${informationCategory}?ClaveAPI=${this.apiKey}`;
   }
 
   /**
    * Realiza una petición de información a la API
-   * @param tipoInformacion Tipo de información a solicitar
+   * @param informationCategory Tipo de información a solicitar
    * @returns Promesa con la respuesta de la API
    */
   private async fetchInformation<T>(
-    tipoInformacion: TipoInformacion
+    informationCategory: InformationCategory
   ): Promise<RespuestaGeneral<T>> {
-    const url = this.buildUrl(tipoInformacion);
+    const url = this.buildUrl(informationCategory);
+    console.log(`Fetching information from URL: ${url}`);
 
     try {
       const response = await fetch(url, {
@@ -96,7 +97,9 @@ export class InformationService {
   async fetchAutonomousCommunities(): Promise<
     GeneralResponse<AutonomousCommunity[]>
   > {
-    const response = await this.fetchInformation<CCAA[]>(TipoInformacion.CCAA);
+    const response = await this.fetchInformation<CCAA[]>(
+      InformationCategory.AutonomousCommunity
+    );
 
     const mappedData = response.Datos?.map(mapCCAA) ?? [];
 
@@ -113,7 +116,7 @@ export class InformationService {
    */
   async fetchProvinces(): Promise<GeneralResponse<Province[]>> {
     const response = await this.fetchInformation<Provincia[]>(
-      TipoInformacion.Provincias
+      InformationCategory.Province
     );
 
     const mappedData = response.Datos?.map(mapProvincia) ?? [];
@@ -131,7 +134,7 @@ export class InformationService {
    */
   async fetchStations(): Promise<GeneralResponse<Station[]>> {
     const response = await this.fetchInformation<Estacion[]>(
-      TipoInformacion.Estaciones
+      InformationCategory.Station
     );
 
     const mappedData = response.Datos?.map(mapEstacion) ?? [];
@@ -150,7 +153,7 @@ export class InformationService {
    */
   async fetchAccessData(): Promise<GeneralResponse<AccessInformation>> {
     const response = await this.fetchInformation<InformacionAccesos>(
-      TipoInformacion.Accesos
+      InformationCategory.Access
     );
 
     const mappedData = response.Datos
