@@ -1,5 +1,5 @@
 export interface RespuestaGeneral<T> {
-  Datos?: T;
+  datos?: T;
   MensajeRespuesta: string | null;
   error?: {
     type: "network" | "http" | "parse";

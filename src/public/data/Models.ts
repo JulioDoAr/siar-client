@@ -13,8 +13,8 @@ export enum DataType {
  */
 export enum Scope {
   AutonomousCommunity = "CCAA",
-  Province = "Provincia",
-  Station = "Estacion",
+  Province = "PROVINCIA",
+  Station = "ESTACION",
 }
 
 /**
@@ -43,6 +43,10 @@ export interface HourlyData {
   station: string;
   /** Data date (ISO 8601 format) */
   date: string;
+  /** Province ID */
+  provinceId: number;
+  /** Station ID */
+  stationId: number;
 }
 
 /**
@@ -95,6 +99,10 @@ export interface DailyData {
   station: string;
   /** Data date (ISO 8601 format) */
   date: string;
+  /** Province ID */
+  provinceId: number;
+  /** Station ID */
+  stationId: number;
 }
 
 /**

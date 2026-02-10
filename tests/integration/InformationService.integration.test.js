@@ -62,29 +62,23 @@ describe("InformationService Integration", () => {
     // Endpoints and API key present
     const urls = global.fetch.mock.calls.map((c) => c[0]);
     expect(urls[0]).toContain("Info/CCAA");
-    expect(urls[1]).toContain("Info/Provincias");
-    expect(urls[2]).toContain("Info/Estaciones");
-    expect(urls[3]).toContain("Info/Accesos");
-    urls.forEach((u) => expect(u).toContain(`ClaveAPI=${mockApiKey}`));
+    expect(urls[1]).toContain("Info/PROVINCIAS");
+    expect(urls[2]).toContain("Info/ESTACIONES");
+    expect(urls[3]).toContain("Info/ACCESOS");
+    urls.forEach((u) => expect(u).toContain(`token=${mockApiKey}`));
   });
 
-  it("falls back to defaults when access info Datos missing", async () => {
+  it("returns undefined data when access info Datos missing", async () => {
     global.fetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
-      json: async () => ({ Datos: undefined, MensajeRespuesta: null }),
+      json: async () => ({
+        MensajeRespuesta: "Error: datos no disponibles",
+      }),
     });
 
     const result = await service.fetchAccessData();
-    expect(result.data).toEqual({
-      accessesCurrentMinute: 0,
-      maxAccessesPerMinute: 0,
-      accessesCurrentDay: 0,
-      maxAccessesPerDay: 0,
-      recordsCurrentMinute: 0,
-      maxRecordsPerMinute: 0,
-      recordsCurrentDay: 0,
-      maxRecordsPerDay: 0,
-    });
+    expect(result.data).toBeUndefined();
+    expect(result.message).toBe("Error: datos no disponibles");
   });
 });

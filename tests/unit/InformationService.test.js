@@ -5,6 +5,7 @@ import {
   mapProvincia,
   mapEstacion,
   mapInformacionAccesos,
+  mapCodigoValidacion,
 } from "../../src/mappers/Mappers.js";
 import {
   mockCCAAResponse,
@@ -14,7 +15,11 @@ import {
   mockAccesosResponse,
   mockResponseWithMessage,
   expectedProvinciasResponse,
+  expectedStationsResponse,
+  mockCodigosValidacionResponse,
+  expectedValidationCodesResponse,
 } from "../mocks/mock-responses.js";
+import { BASE_URL } from "../../src/internal/Consts.js";
 
 // Mock global fetch
 global.fetch = jest.fn();
@@ -52,7 +57,7 @@ describe("InformationService", () => {
         expect.objectContaining({
           method: "GET",
           headers: { Accept: "application/json" },
-        })
+        }),
       );
     });
 
@@ -67,7 +72,7 @@ describe("InformationService", () => {
 
       expect(result.data).toEqual([]);
       expect(result.message).toBe(
-        "No hay datos disponibles para el período solicitado"
+        "No hay datos disponibles para el período solicitado",
       );
     });
   });
@@ -84,8 +89,8 @@ describe("InformationService", () => {
 
       expect(result).toEqual(expectedProvinciasResponse);
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining("Info/Provincias"),
-        expect.any(Object)
+        expect.stringContaining("Info/PROVINCIAS"),
+        expect.any(Object),
       );
     });
   });
@@ -100,13 +105,10 @@ describe("InformationService", () => {
 
       const result = await service.fetchStations();
 
-      expect(result).toEqual({
-        data: mockEstacionesResponse.Datos.map(mapEstacion),
-        message: mockEstacionesResponse.MensajeRespuesta,
-      });
+      expect(result).toEqual(expectedStationsResponse);
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining("Info/Estaciones"),
-        expect.any(Object)
+        expect.stringContaining("Info/ESTACIONES"),
+        expect.any(Object),
       );
     });
   });
@@ -122,35 +124,46 @@ describe("InformationService", () => {
       const result = await service.fetchAccessData();
 
       expect(result).toEqual({
-        data: mapInformacionAccesos(mockAccesosResponse.Datos),
+        data: mapInformacionAccesos(mockAccesosResponse.datos),
         message: mockAccesosResponse.MensajeRespuesta,
       });
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining("Info/Accesos"),
-        expect.any(Object)
+        expect.stringContaining("Info/ACCESOS"),
+        expect.any(Object),
       );
     });
 
-    it("should return defaults when Datos is missing", async () => {
+    it("should return undefined data when datos is missing", async () => {
       global.fetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: async () => ({ Datos: undefined, MensajeRespuesta: null }),
+        json: async () => ({
+          MensajeRespuesta: "Error: datos no disponibles",
+        }),
       });
 
       const result = await service.fetchAccessData();
 
-      expect(result.data).toEqual({
-        accessesCurrentMinute: 0,
-        maxAccessesPerMinute: 0,
-        accessesCurrentDay: 0,
-        maxAccessesPerDay: 0,
-        recordsCurrentMinute: 0,
-        maxRecordsPerMinute: 0,
-        recordsCurrentDay: 0,
-        maxRecordsPerDay: 0,
+      expect(result.data).toBeUndefined();
+      expect(result.message).toBe("Error: datos no disponibles");
+    });
+  });
+
+  describe("fetchValidationCodes", () => {
+    it("should fetch validation codes successfully", async () => {
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => mockCodigosValidacionResponse,
       });
-      expect(result.message).toBeNull();
+
+      const result = await service.fetchValidationCodes();
+
+      expect(result).toEqual(expectedValidationCodesResponse);
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining("Info/CODIGOSVALIDACION"),
+        expect.any(Object),
+      );
     });
   });
 
@@ -165,12 +178,10 @@ describe("InformationService", () => {
       await service.fetchAutonomousCommunities();
 
       const callUrl = global.fetch.mock.calls[0][0];
-      expect(callUrl).toContain(
-        "https://servicio.mapama.gob.es/apisiar/API/v1/Info"
-      );
+      expect(callUrl).toContain(BASE_URL + "/API/V1/Info");
     });
 
-    it("should include ClaveAPI in the URL", async () => {
+    it("should include token in the URL", async () => {
       global.fetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
@@ -180,7 +191,7 @@ describe("InformationService", () => {
       await service.fetchProvinces();
 
       const callUrl = global.fetch.mock.calls[0][0];
-      expect(callUrl).toContain(`ClaveAPI=${mockApiKey}`);
+      expect(callUrl).toContain(`token=${mockApiKey}`);
     });
 
     it("should call the correct endpoints", async () => {
@@ -200,7 +211,7 @@ describe("InformationService", () => {
         json: async () => mockProvinciasResponse,
       });
       await service.fetchProvinces();
-      expect(global.fetch.mock.calls[1][0]).toContain("Info/Provincias");
+      expect(global.fetch.mock.calls[1][0]).toContain("Info/PROVINCIAS");
 
       // Estaciones
       global.fetch.mockResolvedValueOnce({
@@ -209,7 +220,7 @@ describe("InformationService", () => {
         json: async () => mockEstacionesResponse,
       });
       await service.fetchStations();
-      expect(global.fetch.mock.calls[2][0]).toContain("Info/Estaciones");
+      expect(global.fetch.mock.calls[2][0]).toContain("Info/ESTACIONES");
 
       // Accesos
       global.fetch.mockResolvedValueOnce({
@@ -218,7 +229,16 @@ describe("InformationService", () => {
         json: async () => mockAccesosResponse,
       });
       await service.fetchAccessData();
-      expect(global.fetch.mock.calls[3][0]).toContain("Info/Accesos");
+      expect(global.fetch.mock.calls[3][0]).toContain("Info/ACCESOS");
+
+      // Códigos de Validación
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => mockCodigosValidacionResponse,
+      });
+      await service.fetchValidationCodes();
+      expect(global.fetch.mock.calls[4][0]).toContain("Info/CODIGOSVALIDACION");
     });
   });
 });

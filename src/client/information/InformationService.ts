@@ -1,8 +1,10 @@
+import { BASE_URL } from "../../internal/Consts.js";
 import type {
   CCAA,
   Provincia,
   Estacion,
   InformacionAccesos,
+  CodigoValidacion,
 } from "../../internal/information/Models.js";
 import type { RespuestaGeneral } from "../../internal/Models.js";
 import {
@@ -10,6 +12,7 @@ import {
   mapProvincia,
   mapEstacion,
   mapInformacionAccesos,
+  mapCodigoValidacion,
 } from "../../mappers/Mappers.js";
 import {
   InformationCategory,
@@ -17,6 +20,7 @@ import {
   type Province,
   type Station,
   type AccessInformation,
+  type ValidationCode,
 } from "../../public/information/Models.js";
 import type { GeneralResponse } from "../../public/Models.js";
 
@@ -24,8 +28,7 @@ import type { GeneralResponse } from "../../public/Models.js";
  * Servicio para obtener información de permisos y accesos en la Web API SIAR
  */
 export class InformationService {
-  private baseUrl: string =
-    "https://servicio.mapama.gob.es/apisiar/API/v1/Info";
+  private baseUrl: string;
   private apiKey: string;
 
   /**
@@ -34,6 +37,7 @@ export class InformationService {
    */
   constructor(apiKey: string) {
     this.apiKey = apiKey;
+    this.baseUrl = BASE_URL + "/API/V1/Info";
   }
 
   /**
@@ -42,7 +46,7 @@ export class InformationService {
    * @returns URL completa para la petición
    */
   private buildUrl(informationCategory: InformationCategory): string {
-    return `${this.baseUrl}/${informationCategory}?ClaveAPI=${this.apiKey}`;
+    return `${this.baseUrl}/${informationCategory}?token=${this.apiKey}`;
   }
 
   /**
@@ -51,7 +55,7 @@ export class InformationService {
    * @returns Promesa con la respuesta de la API
    */
   private async fetchInformation<T>(
-    informationCategory: InformationCategory
+    informationCategory: InformationCategory,
   ): Promise<RespuestaGeneral<T>> {
     const url = this.buildUrl(informationCategory);
     console.log(`Fetching information from URL: ${url}`);
@@ -64,19 +68,23 @@ export class InformationService {
         },
       });
 
+      const data: RespuestaGeneral<T> =
+        (await response.json()) as RespuestaGeneral<T>;
+
       if (!response.ok) {
+        console.error(
+          `HTTP error! status: ${response.status} - ${response.statusText}`,
+        );
         return {
-          MensajeRespuesta: null,
+          MensajeRespuesta: data.MensajeRespuesta,
           error: {
             type: "http",
             statusCode: response.status,
-            details: `HTTP error! status: ${response.status}`,
+            details: `HTTP error! status: ${response.status} - ${response.statusText}`,
           },
         };
       }
 
-      const data: RespuestaGeneral<T> =
-        (await response.json()) as RespuestaGeneral<T>;
       return data;
     } catch (error) {
       return {
@@ -98,10 +106,17 @@ export class InformationService {
     GeneralResponse<AutonomousCommunity[]>
   > {
     const response = await this.fetchInformation<CCAA[]>(
-      InformationCategory.AutonomousCommunity
+      InformationCategory.AutonomousCommunity,
     );
 
-    const mappedData = response.Datos?.map(mapCCAA) ?? [];
+    // If there's no datos field, return only the message (error case)
+    if (!response.datos) {
+      return {
+        message: response.MensajeRespuesta,
+      };
+    }
+
+    const mappedData = response.datos.map(mapCCAA);
 
     return {
       data: mappedData,
@@ -116,10 +131,17 @@ export class InformationService {
    */
   async fetchProvinces(): Promise<GeneralResponse<Province[]>> {
     const response = await this.fetchInformation<Provincia[]>(
-      InformationCategory.Province
+      InformationCategory.Province,
     );
 
-    const mappedData = response.Datos?.map(mapProvincia) ?? [];
+    // If there's no datos field, return only the message (error case)
+    if (!response.datos) {
+      return {
+        message: response.MensajeRespuesta,
+      };
+    }
+
+    const mappedData = response.datos.map(mapProvincia);
 
     return {
       data: mappedData,
@@ -134,10 +156,17 @@ export class InformationService {
    */
   async fetchStations(): Promise<GeneralResponse<Station[]>> {
     const response = await this.fetchInformation<Estacion[]>(
-      InformationCategory.Station
+      InformationCategory.Station,
     );
 
-    const mappedData = response.Datos?.map(mapEstacion) ?? [];
+    // If there's no datos field, return only the message (error case)
+    if (!response.datos) {
+      return {
+        message: response.MensajeRespuesta,
+      };
+    }
+
+    const mappedData = response.datos.map(mapEstacion);
 
     return {
       data: mappedData,
@@ -153,21 +182,41 @@ export class InformationService {
    */
   async fetchAccessData(): Promise<GeneralResponse<AccessInformation>> {
     const response = await this.fetchInformation<InformacionAccesos>(
-      InformationCategory.Access
+      InformationCategory.Access,
     );
 
-    const mappedData = response.Datos
-      ? mapInformacionAccesos(response.Datos)
-      : {
-          accessesCurrentMinute: 0,
-          maxAccessesPerMinute: 0,
-          accessesCurrentDay: 0,
-          maxAccessesPerDay: 0,
-          recordsCurrentMinute: 0,
-          maxRecordsPerMinute: 0,
-          recordsCurrentDay: 0,
-          maxRecordsPerDay: 0,
-        };
+    // If there's no datos field, return only the message (error case)
+    if (!response.datos) {
+      return {
+        message: response.MensajeRespuesta,
+      };
+    }
+
+    const mappedData = mapInformacionAccesos(response.datos);
+
+    return {
+      data: mappedData,
+      message: response.MensajeRespuesta,
+    };
+  }
+
+  /**
+   * Obtiene la descripción de los códigos de validación
+   * @returns Promesa con la lista de códigos de validación
+   */
+  async fetchValidationCodes(): Promise<GeneralResponse<ValidationCode[]>> {
+    const response = await this.fetchInformation<CodigoValidacion[]>(
+      InformationCategory.ValidationCode,
+    );
+
+    // If there's no datos field, return only the message (error case)
+    if (!response.datos) {
+      return {
+        message: response.MensajeRespuesta,
+      };
+    }
+
+    const mappedData = response.datos.map(mapCodigoValidacion);
 
     return {
       data: mappedData,

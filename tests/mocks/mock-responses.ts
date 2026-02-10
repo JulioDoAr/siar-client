@@ -9,6 +9,7 @@ import type {
   Provincia,
   Estacion,
   InformacionAccesos,
+  CodigoValidacion,
 } from "../../src/internal/information/Models.js";
 import type { RespuestaGeneral } from "../../src/internal/Models.js";
 import type {
@@ -16,6 +17,7 @@ import type {
   AutonomousCommunity,
   Province,
   Station,
+  ValidationCode,
 } from "../../src/public/information/Models.js";
 import type { GeneralResponse } from "../../src/public/Models.js";
 
@@ -23,7 +25,7 @@ import type { GeneralResponse } from "../../src/public/Models.js";
  * Respuesta exitosa con datos horarios
  */
 export const mockDatoHorarioResponse: RespuestaGeneral<DatoHorario[]> = {
-  Datos: [
+  datos: [
     {
       HoraMin: 0,
       TempMedia: 15.5,
@@ -36,6 +38,8 @@ export const mockDatoHorarioResponse: RespuestaGeneral<DatoHorario[]> = {
       TempSuelo2: null,
       Estacion: "EST001",
       Fecha: "2026-01-04T00:00:00Z",
+      IdProvincia: 1,
+      IdEstacion: 1,
     },
     {
       HoraMin: 30,
@@ -49,6 +53,8 @@ export const mockDatoHorarioResponse: RespuestaGeneral<DatoHorario[]> = {
       TempSuelo2: null,
       Estacion: "EST001",
       Fecha: "2026-01-04T00:30:00Z",
+      IdProvincia: 1,
+      IdEstacion: 1,
     },
   ],
   MensajeRespuesta: null,
@@ -58,7 +64,7 @@ export const mockDatoHorarioResponse: RespuestaGeneral<DatoHorario[]> = {
  * Respuesta exitosa con datos diarios
  */
 export const mockDatoDiarioResponse: RespuestaGeneral<DatoDiario[]> = {
-  Datos: [
+  datos: [
     {
       TempMedia: 18.5,
       TempMax: 25.3,
@@ -83,6 +89,8 @@ export const mockDatoDiarioResponse: RespuestaGeneral<DatoDiario[]> = {
       PePMon: 0,
       Estacion: "EST001",
       Fecha: "2026-01-04T00:00:00Z",
+      IdProvincia: 1,
+      IdEstacion: 1,
     },
   ],
   MensajeRespuesta: null,
@@ -92,7 +100,7 @@ export const mockDatoDiarioResponse: RespuestaGeneral<DatoDiario[]> = {
  * Respuesta exitosa con datos semanales
  */
 export const mockDatoSemanalResponse: RespuestaGeneral<DatoSemanal[]> = {
-  Datos: [
+  datos: [
     {
       Año: 2026,
       Semana: 1,
@@ -125,7 +133,7 @@ export const mockDatoSemanalResponse: RespuestaGeneral<DatoSemanal[]> = {
  * Respuesta exitosa con datos mensuales
  */
 export const mockDatoMensualResponse: RespuestaGeneral<DatoMensual[]> = {
-  Datos: [
+  datos: [
     {
       Año: 2026,
       Mes: 1,
@@ -156,11 +164,19 @@ export const mockDatoMensualResponse: RespuestaGeneral<DatoMensual[]> = {
 };
 
 /**
- * Respuesta exitosa con mensaje
+ * Respuesta con mensaje pero sin datos (respuesta exitosa con datos vacíos)
  */
 export const mockResponseWithMessage: RespuestaGeneral<DatoHorario[]> = {
-  Datos: [],
+  datos: [],
   MensajeRespuesta: "No hay datos disponibles para el período solicitado",
+};
+
+/**
+ * Respuesta de error de la API (sin campo datos, solo mensaje)
+ */
+export const mockApiErrorResponse: RespuestaGeneral<DatoHorario[]> = {
+  MensajeRespuesta:
+    "La Fecha Inicial de consulta proporcionada es inferior a la Fecha Mínima Inicial autorizada",
 };
 
 /**
@@ -173,9 +189,9 @@ export const mockErrorResponse = {
 };
 
 export const mockCCAAResponse: RespuestaGeneral<CCAA[]> = {
-  Datos: [
-    { Identificador: "CCAA01", Descripcion: "Andalucía" },
-    { Identificador: "CCAA02", Descripcion: "Madrid" },
+  datos: [
+    { CCAA: "Andalucía", Codigo: "CCAA01" },
+    { CCAA: "Madrid", Codigo: "CCAA02" },
   ],
   MensajeRespuesta: null,
 };
@@ -189,16 +205,18 @@ export const expectedCCAAResponse: GeneralResponse<AutonomousCommunity[]> = {
 };
 
 export const mockProvinciasResponse: RespuestaGeneral<Provincia[]> = {
-  Datos: [{ Provincia: "Cáceres", Codigo: "CC", Codigo_CCAA: "EXT" }],
+  datos: [
+    { Provincia: "Cáceres", Codigo: "CC", Codigo_CCAA: "EXT", IdProvincia: 10 },
+  ],
   MensajeRespuesta: null,
 };
 export const expectedProvinciasResponse: GeneralResponse<Province[]> = {
-  data: [{ name: "Cáceres", code: "CC", ccaaCode: "EXT" }],
+  data: [{ name: "Cáceres", code: "CC", ccaaCode: "EXT", id: 10 }],
   message: null,
 };
 
 export const mockEstacionesResponse: RespuestaGeneral<Estacion[]> = {
-  Datos: [
+  datos: [
     {
       Codigo: "EST001",
       Estacion: "Estación 1",
@@ -211,6 +229,9 @@ export const mockEstacionesResponse: RespuestaGeneral<Estacion[]> = {
       Termino: "Madrid",
       XUTM: 500000,
       YUTM: 4500000,
+      Red_estacion: "Red de estaciones del Ministerio",
+      IdProvincia: 28,
+      IdEstacion: 1,
     },
     {
       Codigo: "EST002",
@@ -224,6 +245,9 @@ export const mockEstacionesResponse: RespuestaGeneral<Estacion[]> = {
       Termino: "Barcelona",
       XUTM: 600000,
       YUTM: 4600000,
+      Red_estacion: "Red de estaciones de CA",
+      IdProvincia: 8,
+      IdEstacion: 2,
     },
   ],
   MensajeRespuesta: null,
@@ -242,6 +266,9 @@ export const expectedStationsResponse: GeneralResponse<Station[]> = {
       municipality: "Madrid",
       utmX: 500000,
       utmY: 4500000,
+      networkType: "Red de estaciones del Ministerio",
+      provinceId: 28,
+      stationId: 1,
     },
     {
       code: "EST002",
@@ -255,13 +282,16 @@ export const expectedStationsResponse: GeneralResponse<Station[]> = {
       municipality: "Barcelona",
       utmX: 600000,
       utmY: 4600000,
+      networkType: "Red de estaciones de CA",
+      provinceId: 8,
+      stationId: 2,
     },
   ],
   message: null,
 };
 
 export const mockAccesosResponse: RespuestaGeneral<InformacionAccesos> = {
-  Datos: {
+  datos: {
     NumAccesosMinutoActual: 3,
     MaxAccesosMinuto: 60,
     NumAccesosDiaActual: 45,
@@ -287,3 +317,52 @@ export const expectedAccessesResponse: GeneralResponse<AccessInformation> = {
   },
   message: null,
 };
+
+export const mockCodigosValidacionResponse: RespuestaGeneral<
+  CodigoValidacion[]
+> = {
+  datos: [
+    {
+      Descripcion: "Dato incorporado sin ningún error (Nivel 1)",
+      IdCodigoValidacion: "100",
+    },
+    {
+      Descripcion: "Dato incorporado con advertencias (Nivel 2)",
+      IdCodigoValidacion: "200",
+    },
+  ],
+  MensajeRespuesta: null,
+};
+
+export const expectedValidationCodesResponse: GeneralResponse<
+  ValidationCode[]
+> = {
+  data: [
+    { id: "100", description: "Dato incorporado sin ningún error (Nivel 1)" },
+    { id: "200", description: "Dato incorporado con advertencias (Nivel 2)" },
+  ],
+  message: null,
+};
+
+/**
+ * Respuesta exitosa con cadena cifrada
+ */
+export const mockCadenaCifradaResponse: string = "abc123XYZ789encrypted==";
+
+/**
+ * Respuesta exitosa con token de autenticación
+ */
+export const mockTokenAutenticacionResponse: string =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test.token";
+
+/**
+ * Respuesta esperada con cadena cifrada
+ */
+export const expectedEncryptedStringResponse: string =
+  "abc123XYZ789encrypted==";
+
+/**
+ * Respuesta esperada con token de autenticación
+ */
+export const expectedAuthenticationTokenResponse: string =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test.token";

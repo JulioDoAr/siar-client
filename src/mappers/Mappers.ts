@@ -3,6 +3,7 @@ import type {
   Province,
   Station,
   AccessInformation,
+  ValidationCode,
 } from "../public/information/Models.js";
 import type {
   HourlyData,
@@ -21,6 +22,7 @@ import type {
   Provincia,
   Estacion,
   InformacionAccesos,
+  CodigoValidacion,
 } from "../internal/information/Models.js";
 
 /**
@@ -39,6 +41,8 @@ export function mapDatoHorarioToHourlyData(dato: DatoHorario): HourlyData {
     soilTemperature2: dato.TempSuelo2,
     station: dato.Estacion,
     date: dato.Fecha,
+    provinceId: dato.IdProvincia,
+    stationId: dato.IdEstacion,
   };
 }
 
@@ -70,6 +74,8 @@ export function mapDatoDiarioToDailyData(dato: DatoDiario): DailyData {
     pePenmanMonteith: dato.PePMon,
     station: dato.Estacion,
     date: dato.Fecha,
+    provinceId: dato.IdProvincia,
+    stationId: dato.IdEstacion,
   };
 }
 
@@ -139,8 +145,8 @@ export function mapDatoMensualToMonthlyData(dato: DatoMensual): MonthlyData {
  */
 export function mapCCAA(ccaa: CCAA): AutonomousCommunity {
   return {
-    id: ccaa.Identificador,
-    description: ccaa.Descripcion,
+    id: ccaa.Codigo,
+    description: ccaa.CCAA,
   };
 }
 
@@ -152,6 +158,7 @@ export function mapProvincia(provincia: Provincia): Province {
     name: provincia.Provincia,
     code: provincia.Codigo,
     ccaaCode: provincia.Codigo_CCAA,
+    id: provincia.IdProvincia,
   };
 }
 
@@ -171,6 +178,9 @@ export function mapEstacion(estacion: Estacion): Station {
     municipality: estacion.Termino,
     utmX: estacion.XUTM,
     utmY: estacion.YUTM,
+    networkType: estacion.Red_estacion,
+    provinceId: estacion.IdProvincia,
+    stationId: estacion.IdEstacion,
   };
 }
 
@@ -178,7 +188,7 @@ export function mapEstacion(estacion: Estacion): Station {
  * Maps InformacionAccesos to AccessInformation
  */
 export function mapInformacionAccesos(
-  info: InformacionAccesos
+  info: InformacionAccesos,
 ): AccessInformation {
   return {
     accessesCurrentMinute: info.NumAccesosMinutoActual,
@@ -189,5 +199,15 @@ export function mapInformacionAccesos(
     maxRecordsPerMinute: info.MaxRegistrosMinuto,
     recordsCurrentDay: info.RegistrosAcumuladosDia,
     maxRecordsPerDay: info.MaxRegistrosDia,
+  };
+}
+
+/**
+ * Maps CodigoValidacion to ValidationCode
+ */
+export function mapCodigoValidacion(codigo: CodigoValidacion): ValidationCode {
+  return {
+    description: codigo.Descripcion,
+    id: codigo.IdCodigoValidacion,
   };
 }

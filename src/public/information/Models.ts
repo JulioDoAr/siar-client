@@ -3,9 +3,10 @@
  */
 export enum InformationCategory {
   AutonomousCommunity = "CCAA",
-  Province = "Provincias",
-  Station = "Estaciones",
-  Access = "Accesos",
+  Province = "PROVINCIAS",
+  Station = "ESTACIONES",
+  Access = "ACCESOS",
+  ValidationCode = "CODIGOSVALIDACION",
 }
 
 /**
@@ -28,6 +29,8 @@ export interface Province {
   code: string;
   /** Code of the autonomous community to which the province belongs */
   ccaaCode: string;
+  /** Province ID */
+  id: number;
 }
 
 /**
@@ -56,6 +59,22 @@ export interface Station {
   utmX: number;
   /** UTM Y coordinate */
   utmY: number;
+  /** Network type (ministry or autonomous community) */
+  networkType: string;
+  /** Province ID */
+  provinceId: number;
+  /** Station ID */
+  stationId: number;
+}
+
+/**
+ * Validation code information
+ */
+export interface ValidationCode {
+  /** Description of the validation code */
+  description: string;
+  /** Validation code ID */
+  id: string;
 }
 
 /**

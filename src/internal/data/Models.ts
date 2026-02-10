@@ -24,6 +24,10 @@ export interface DatoHorario {
   Estacion: string;
   /** Fecha del dato (formato ISO 8601) */
   Fecha: string;
+  /** ID numérico que identifica a la provincia */
+  IdProvincia: number;
+  /** Identificador interno único de la estación */
+  IdEstacion: number;
 }
 
 /**
@@ -76,6 +80,10 @@ export interface DatoDiario {
   Estacion: string;
   /** Fecha del dato (formato ISO 8601) */
   Fecha: string;
+  /** ID numérico que identifica a la provincia */
+  IdProvincia: number;
+  /** Identificador interno único de la estación */
+  IdEstacion: number;
 }
 
 /**

@@ -1,3 +1,4 @@
+import { BASE_URL } from "../../internal/Consts.js";
 import type {
   DatoHorario,
   DatoDiario,
@@ -33,14 +34,15 @@ export interface DataPetitionParams {
   endDate: string;
   /** OPCIONAL: Fecha de última modificación en formato AAAA-MM-DD */
   lastModifiedDate?: string;
+  /** OPCIONAL: Indica si se deben mostrar las variables calculadas (solo para Diarios, Semanales y Mensuales) */
+  calculatedData?: boolean;
 }
 
 /**
  * Servicio para realizar peticiones de datos a la Web API SIAR
  */
 export class DataPetitionService {
-  private baseUrl: string =
-    "https://servicio.mapama.gob.es/apisiar/API/v1/Datos";
+  private baseUrl: string;
   private apiKey: string;
 
   /**
@@ -49,6 +51,7 @@ export class DataPetitionService {
    */
   constructor(apiKey: string) {
     this.apiKey = apiKey;
+    this.baseUrl = BASE_URL + "/API/V1/Datos";
   }
 
   /**
@@ -61,9 +64,10 @@ export class DataPetitionService {
   private buildUrl(
     tipoDatos: DataType,
     ambito: Scope,
-    params: DataPetitionParams
+    params: DataPetitionParams,
   ): string {
-    const { ids, startDate, endDate, lastModifiedDate } = params;
+    const { ids, startDate, endDate, lastModifiedDate, calculatedData } =
+      params;
 
     // Construir la URL base con tipo de datos y ámbito
     let url = `${this.baseUrl}/${tipoDatos}/${ambito}?`;
@@ -75,11 +79,16 @@ export class DataPetitionService {
     // Agregar fechas y clave API
     url += `&FechaInicial=${startDate}`;
     url += `&FechaFinal=${endDate}`;
-    url += `&ClaveAPI=${this.apiKey}`;
+    url += `&token=${this.apiKey}`;
 
     // Agregar fecha de última modificación si está presente
     if (lastModifiedDate) {
       url += `&FechaUltModificacion=${lastModifiedDate}`;
+    }
+
+    // Agregar datos calculados si está presente
+    if (calculatedData !== undefined) {
+      url += `&DatosCalculados=${calculatedData}`;
     }
 
     return url;
@@ -95,7 +104,7 @@ export class DataPetitionService {
   private async fetchData<T>(
     tipoDatos: DataType,
     ambito: Scope,
-    params: DataPetitionParams
+    params: DataPetitionParams,
   ): Promise<RespuestaGeneral<T>> {
     const url = this.buildUrl(tipoDatos, ambito, params);
 
@@ -107,9 +116,11 @@ export class DataPetitionService {
         },
       });
 
+      const data: RespuestaGeneral<T> =
+        (await response.json()) as RespuestaGeneral<T>;
       if (!response.ok) {
         return {
-          MensajeRespuesta: null,
+          MensajeRespuesta: data.MensajeRespuesta,
           error: {
             type: "http",
             statusCode: response.status,
@@ -118,8 +129,6 @@ export class DataPetitionService {
         };
       }
 
-      const data: RespuestaGeneral<T> =
-        (await response.json()) as RespuestaGeneral<T>;
       return data;
     } catch (error) {
       return {
@@ -140,15 +149,22 @@ export class DataPetitionService {
    */
   async fetchHourlyData(
     scope: Scope,
-    params: DataPetitionParams
+    params: DataPetitionParams,
   ): Promise<GeneralResponse<HourlyData[]>> {
     const response = await this.fetchData<DatoHorario[]>(
       DataType.Hourly,
       scope,
-      params
+      params,
     );
 
-    const mappedData = response.Datos?.map(mapDatoHorarioToHourlyData) ?? [];
+    // If there's no datos field, return only the message (error case)
+    if (!response.datos) {
+      return {
+        message: response.MensajeRespuesta,
+      };
+    }
+
+    const mappedData = response.datos.map(mapDatoHorarioToHourlyData);
 
     return {
       data: mappedData,
@@ -164,15 +180,22 @@ export class DataPetitionService {
    */
   async fetchDailyData(
     ambito: Scope,
-    params: DataPetitionParams
+    params: DataPetitionParams,
   ): Promise<GeneralResponse<DailyData[]>> {
     const response = await this.fetchData<DatoDiario[]>(
       DataType.Daily,
       ambito,
-      params
+      params,
     );
 
-    const mappedData = response.Datos?.map(mapDatoDiarioToDailyData) ?? [];
+    // If there's no datos field, return only the message (error case)
+    if (!response.datos) {
+      return {
+        message: response.MensajeRespuesta,
+      };
+    }
+
+    const mappedData = response.datos.map(mapDatoDiarioToDailyData);
 
     return {
       data: mappedData,
@@ -188,15 +211,22 @@ export class DataPetitionService {
    */
   async fetchWeeklyData(
     ambito: Scope,
-    params: DataPetitionParams
+    params: DataPetitionParams,
   ): Promise<GeneralResponse<WeeklyData[]>> {
     const response = await this.fetchData<DatoSemanal[]>(
       DataType.Weekly,
       ambito,
-      params
+      params,
     );
 
-    const mappedData = response.Datos?.map(mapDatoSemanalToWeeklyData) ?? [];
+    // If there's no datos field, return only the message (error case)
+    if (!response.datos) {
+      return {
+        message: response.MensajeRespuesta,
+      };
+    }
+
+    const mappedData = response.datos.map(mapDatoSemanalToWeeklyData);
 
     return {
       data: mappedData,
@@ -212,15 +242,22 @@ export class DataPetitionService {
    */
   async fetchMonthlyData(
     ambito: Scope,
-    params: DataPetitionParams
+    params: DataPetitionParams,
   ): Promise<GeneralResponse<MonthlyData[]>> {
     const response = await this.fetchData<DatoMensual[]>(
       DataType.Monthly,
       ambito,
-      params
+      params,
     );
 
-    const mappedData = response.Datos?.map(mapDatoMensualToMonthlyData) ?? [];
+    // If there's no datos field, return only the message (error case)
+    if (!response.datos) {
+      return {
+        message: response.MensajeRespuesta,
+      };
+    }
+
+    const mappedData = response.datos.map(mapDatoMensualToMonthlyData);
 
     return {
       data: mappedData,

@@ -21,6 +21,7 @@ import {
   paramsWithModificationDate,
   specialCharsParams,
 } from "../mocks/sample-params.js";
+import { BASE_URL } from "../../src/internal/Consts.js";
 
 // Mock global fetch
 global.fetch = jest.fn();
@@ -54,16 +55,16 @@ describe("DataPetitionService", () => {
       const result = await service.fetchHourlyData(Scope.Station, basicParams);
 
       expect(result).toEqual({
-        data: mockDatoHorarioResponse.Datos.map(mapDatoHorarioToHourlyData),
+        data: mockDatoHorarioResponse.datos.map(mapDatoHorarioToHourlyData),
         message: mockDatoHorarioResponse.MensajeRespuesta,
       });
       expect(global.fetch).toHaveBeenCalledTimes(1);
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining("Horarios/Estacion"),
+        expect.stringContaining("Horarios/ESTACION"),
         expect.objectContaining({
           method: "GET",
           headers: { Accept: "application/json" },
-        })
+        }),
       );
     });
 
@@ -80,7 +81,7 @@ describe("DataPetitionService", () => {
       expect(callUrl).toContain("Id=EST001");
       expect(callUrl).toContain("FechaInicial=2026-01-01");
       expect(callUrl).toContain("FechaFinal=2026-01-07");
-      expect(callUrl).toContain(`ClaveAPI=${mockApiKey}`);
+      expect(callUrl).toContain(`token=${mockApiKey}`);
     });
 
     it("should handle multiple IDs in the request", async () => {
@@ -147,30 +148,58 @@ describe("DataPetitionService", () => {
         json: async () => mockDatoDiarioResponse,
       });
 
-      const result = await service.fetchDailyData("Estacion", basicParams);
+      const result = await service.fetchDailyData(Scope.Station, basicParams);
 
       expect(result).toEqual({
-        data: mockDatoDiarioResponse.Datos.map(mapDatoDiarioToDailyData),
+        data: mockDatoDiarioResponse.datos.map(mapDatoDiarioToDailyData),
         message: mockDatoDiarioResponse.MensajeRespuesta,
       });
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining("Diarios/Estacion"),
-        expect.any(Object)
+        expect.stringContaining("Diarios/ESTACION"),
+        expect.any(Object),
       );
     });
 
-    it("should handle responses with messages", async () => {
+    it("should handle responses with empty data array and message", async () => {
+      // This is when the API returns successfully but with no data
       global.fetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
         json: async () => mockResponseWithMessage,
       });
 
-      const result = await service.fetchDailyData("Estacion", basicParams);
+      const result = await service.fetchDailyData(Scope.Station, basicParams);
 
       expect(result.data).toEqual([]);
       expect(result.message).toBe(
-        "No hay datos disponibles para el período solicitado"
+        "No hay datos disponibles para el período solicitado",
+      );
+    });
+
+    it("should handle error responses from API with only MensajeRespuesta", async () => {
+      // This simulates the exact API response the user is experiencing
+      // When there's an error, the API doesn't send a "datos" field at all
+      const apiErrorResponse = {
+        MensajeRespuesta:
+          "La Fecha Inicial de consulta proporcionada es inferior a la Fecha Mínima Inicial autorizada /api/datos/tipodatos/ámbitodatos?token&id&FechaInicial&FechaFinal",
+      };
+
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => apiErrorResponse,
+      });
+
+      const result = await service.fetchDailyData(Scope.Station, {
+        ids: ["CC04"],
+        startDate: "2025-02-04",
+        endDate: "2026-02-09",
+        calculatedData: true,
+      });
+
+      expect(result.data).toBeUndefined();
+      expect(result.message).toBe(
+        "La Fecha Inicial de consulta proporcionada es inferior a la Fecha Mínima Inicial autorizada /api/datos/tipodatos/ámbitodatos?token&id&FechaInicial&FechaFinal",
       );
     });
   });
@@ -183,15 +212,15 @@ describe("DataPetitionService", () => {
         json: async () => mockDatoSemanalResponse,
       });
 
-      const result = await service.fetchWeeklyData("Provincia", basicParams);
+      const result = await service.fetchWeeklyData(Scope.Province, basicParams);
 
       expect(result).toEqual({
-        data: mockDatoSemanalResponse.Datos.map(mapDatoSemanalToWeeklyData),
+        data: mockDatoSemanalResponse.datos.map(mapDatoSemanalToWeeklyData),
         message: mockDatoSemanalResponse.MensajeRespuesta,
       });
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining("Semanales/Provincia"),
-        expect.any(Object)
+        expect.stringContaining("Semanales/PROVINCIA"),
+        expect.any(Object),
       );
     });
   });
@@ -207,12 +236,12 @@ describe("DataPetitionService", () => {
       const result = await service.fetchMonthlyData("CCAA", basicParams);
 
       expect(result).toEqual({
-        data: mockDatoMensualResponse.Datos.map(mapDatoMensualToMonthlyData),
+        data: mockDatoMensualResponse.datos.map(mapDatoMensualToMonthlyData),
         message: mockDatoMensualResponse.MensajeRespuesta,
       });
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringContaining("Mensuales/CCAA"),
-        expect.any(Object)
+        expect.any(Object),
       );
     });
   });
@@ -228,9 +257,7 @@ describe("DataPetitionService", () => {
       await service.fetchHourlyData("Estacion", basicParams);
 
       const callUrl = global.fetch.mock.calls[0][0];
-      expect(callUrl).toContain(
-        "https://servicio.mapama.gob.es/apisiar/API/v1/Datos"
-      );
+      expect(callUrl).toContain(BASE_URL + "/API/V1/Datos");
     });
 
     it("should not include FechaUltModificacion when not provided", async () => {

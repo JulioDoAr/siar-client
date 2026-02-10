@@ -6,7 +6,7 @@ import type {
   Station,
 } from "../../src/public/information/Models.js";
 import type { GeneralResponse } from "../../src/public/Models.js";
-import type { DataPetitionParams } from "../../src/client/data/DataService.js";
+import type { DataPetitionParams } from "../../src/index.js";
 
 describe("SIARClient", () => {
   let service: SIARClient;
@@ -16,7 +16,6 @@ describe("SIARClient", () => {
 
   beforeAll(() => {
     const apiKey = process.env.SIAR_API_KEY;
-    // const apiKey = "-iq1hWbAy2ueUHm_JJTtDBfVyy9TekPm6uZr4N_EHO_o6_dy-j";
     if (!apiKey) {
       throw new Error("SIAR_API_KEY not set");
     }
@@ -27,10 +26,11 @@ describe("SIARClient", () => {
     communities = await service.fetchAutonomousCommunities();
     expect(communities.data).toBeDefined();
     expect(Array.isArray(communities.data)).toBe(true);
+    expect(communities.data?.length).toBeGreaterThan(0);
     if (!communities.data) {
       console.error(
         "No autonomous communities data fetched. Possible issue: ",
-        communities.message
+        communities.message,
       );
     }
     expect(communities.message).toBeNull();
@@ -40,10 +40,11 @@ describe("SIARClient", () => {
     provinces = await service.fetchProvinces();
     expect(provinces.data).toBeDefined();
     expect(Array.isArray(provinces.data)).toBe(true);
+    expect(provinces.data?.length).toBeGreaterThan(0);
     if (!provinces.data) {
       console.error(
         "No provinces data fetched. Possible issue: ",
-        provinces.message
+        provinces.message,
       );
     }
     expect(provinces.message).toBeNull();
@@ -53,10 +54,11 @@ describe("SIARClient", () => {
     stations = await service.fetchStations();
     expect(stations.data).toBeDefined();
     expect(Array.isArray(stations.data)).toBe(true);
+    expect(stations.data?.length).toBeGreaterThan(0);
     if (!stations.data) {
       console.error(
         "No stations data fetched. Possible issue: ",
-        stations.message
+        stations.message,
       );
     }
     expect(stations.message).toBeNull();
@@ -117,5 +119,64 @@ describe("SIARClient", () => {
     const dailyData = await service.fetchDailyData(scope, params);
     expect(dailyData.data).toBeDefined();
     expect(Array.isArray(dailyData.data)).toBe(true);
+  });
+
+  describe("Authentication (non-mocked)", () => {
+    it("should encrypt a string successfully", async () => {
+      const testString = "TestString123";
+      const result = await service.encryptString(testString);
+
+      expect(result).toBeDefined();
+      if (result && result.includes("Error")) {
+        console.warn("Encryption service error:", result);
+        // Service might not be available, but we test the flow
+        expect(result).toBeUndefined();
+      } else {
+        // If successful, verify the response structure
+        expect(result).toBeDefined();
+        if (result) {
+          expect(result).toBeDefined();
+          expect(typeof result).toBe("string");
+          expect(result.length).toBeGreaterThan(0);
+          console.log("Encrypted value length:", result.length);
+        }
+      }
+    });
+
+    it("should handle authentication token flow (skipped without credentials)", async () => {
+      let userId = process.env.SIAR_USER_ID;
+      let password = process.env.SIAR_PASSWORD;
+
+      if (!userId || !password) {
+        console.warn(
+          "Skipping authentication token test: SIAR_USER_ID or SIAR_PASSWORD not set in environment",
+        );
+        console.warn(
+          "To enable this test, set SIAR_USER_ID and SIAR_PASSWORD environment variables",
+        );
+        return; // Skip the test
+      }
+
+      const result = await service.obtainToken({
+        userId,
+        password,
+      });
+
+      console.log("Authentication token result:", result);
+      expect(result).toBeDefined();
+      if (result && result.includes("Error")) {
+        console.warn("Authentication error:", result);
+        expect(result).toBeUndefined();
+      } else {
+        // If successful, verify the token structure
+        expect(result).toBeDefined();
+        if (result) {
+          expect(result).toBeDefined();
+          expect(typeof result).toBe("string");
+          expect(result.length).toBeGreaterThan(0);
+          console.log("Authentication token obtained successfully");
+        }
+      }
+    });
   });
 });

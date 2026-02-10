@@ -1,150 +1,179 @@
-Basic Setup
+https://servicio.mapa.gob.es/siarapi/API/V1/Datos/Diarios/ESTACION?Id=CC04&FechaInicial=2024-02-04&FechaFinal=2026-02-09&token={token}&DatosCalculados=true
 
-```typescript
-import { SIARClient, Scope } from "siar-client";
-
-const client = new SIARClient("your-api-key-here");
-```
-
-Fetch Available Stations
-
-```typescript
-// Get all available stations
-const stations = await client.fetchStations();
-
-if (stations.data) {
-  stations.data.forEach((station) => {
-    console.log(`${station.description} (${station.code})`);
-    console.log(`  Location: ${station.municipality}`);
-    console.log(`  Coordinates: ${station.latitude}, ${station.longitude}`);
-    console.log(`  Altitude: ${station.altitude}m`);
-  });
+```json
+{
+  "MensajeRespuesta": "La Fecha Inicial de consulta proporcionada es inferior a la Fecha Mínima Inicial autorizada /api/datos/tipodatos/ámbitodatos?token&id&FechaInicial&FechaFinal"
 }
 ```
 
-Fetch Provinces
+https://servicio.mapa.gob.es/siarapi/API/V1/Datos/Diarios/ESTACION?Id=CC04&FechaInicial=2026-02-04&FechaFinal=2026-02-09&token={token}&DatosCalculados=true
 
-```typescript
-// Get all available provinces
-const provinces = await client.fetchProvinces();
-console.log("Available provinces:", provinces.data);
-```
-
-Fetch Hourly Data. Hourly data is recorded every 30 minutes (48 data points per day).
-
-```typescript
-const hourlyData = await client.fetchHourlyData(Scope.Station, {
-  ids: ["ALM01"], // Station code
-  startDate: "2024-01-01",
-  endDate: "2024-01-02",
-});
-
-if (hourlyData.data) {
-  hourlyData.data.forEach((data) => {
-    console.log(`Time: ${data.date} ${data.timeMinutes}min`);
-    console.log(`Temperature: ${data.avgTemperature}°C`);
-    console.log(`Humidity: ${data.avgHumidity}%`);
-    console.log(`Wind Speed: ${data.windSpeed}m/s`);
-    console.log(`Precipitation: ${data.precipitation}mm`);
-    console.log(`Solar Radiation: ${data.radiation}MJ/m²`);
-  });
+```json
+{
+  "datos": [
+    {
+      "Fecha": "2026-02-04T00:00:00",
+      "Estacion": "CC04",
+      "TempMedia": 8.93,
+      "TempMax": 12.31,
+      "HorMinTempMax": 1400,
+      "TempMin": 6.001,
+      "HorMinTempMin": 200,
+      "HumedadMedia": 96.1,
+      "HumedadMax": 100.0,
+      "HorMinHumMax": 1140,
+      "humedadMin": 84.9,
+      "HorMinHumMin": 1410,
+      "VelViento": 1.876,
+      "DirViento": 164.3,
+      "VelVientoMax": 12.0,
+      "HorMinVelMax": 123,
+      "DirVientoVelMax": 121.1,
+      "Radiacion": 2.495,
+      "Precipitacion": 7.9,
+      "TempSuelo1": null,
+      "TempSuelo2": null,
+      "EtPMon": 0.6659705,
+      "PePMon": 4.0837073,
+      "CodTempSuelo1": null,
+      "CodTempSuelo2": null
+    },
+    {
+      "Fecha": "2026-02-05T00:00:00",
+      "Estacion": "CC04",
+      "TempMedia": 12.11,
+      "TempMax": 15.73,
+      "HorMinTempMax": 1400,
+      "TempMin": 9.76,
+      "HorMinTempMin": 2350,
+      "HumedadMedia": 87.0,
+      "HumedadMax": 100.0,
+      "HorMinHumMax": 620,
+      "humedadMin": 64.94,
+      "HorMinHumMin": 1410,
+      "VelViento": 4.327,
+      "DirViento": 218.5,
+      "VelVientoMax": 13.08,
+      "HorMinVelMax": 859,
+      "DirVientoVelMax": 234.9,
+      "Radiacion": 6.349,
+      "Precipitacion": 25.1,
+      "TempSuelo1": null,
+      "TempSuelo2": null,
+      "EtPMon": 1.5794818,
+      "PePMon": 15.459508,
+      "CodTempSuelo1": null,
+      "CodTempSuelo2": null
+    },
+    {
+      "Fecha": "2026-02-06T00:00:00",
+      "Estacion": "CC04",
+      "TempMedia": 8.87,
+      "TempMax": 12.9,
+      "HorMinTempMax": 1430,
+      "TempMin": 5.874,
+      "HorMinTempMin": 2110,
+      "HumedadMedia": 87.9,
+      "HumedadMax": 97.1,
+      "HorMinHumMax": 10,
+      "humedadMin": 63.86,
+      "HorMinHumMin": 1530,
+      "VelViento": 1.939,
+      "DirViento": 225.4,
+      "VelVientoMax": 7.55,
+      "HorMinVelMax": 1335,
+      "DirVientoVelMax": 260.7,
+      "Radiacion": 5.929,
+      "Precipitacion": 2.6,
+      "TempSuelo1": null,
+      "TempSuelo2": null,
+      "EtPMon": 1.1465601,
+      "PePMon": 0.0,
+      "CodTempSuelo1": null,
+      "CodTempSuelo2": null
+    },
+    {
+      "Fecha": "2026-02-07T00:00:00",
+      "Estacion": "CC04",
+      "TempMedia": 7.6,
+      "TempMax": 10.57,
+      "HorMinTempMax": 1850,
+      "TempMin": 5.071,
+      "HorMinTempMin": 600,
+      "HumedadMedia": 90.5,
+      "HumedadMax": 97.9,
+      "HorMinHumMax": 620,
+      "humedadMin": 77.7,
+      "HorMinHumMin": 2050,
+      "VelViento": 4.159,
+      "DirViento": 183.7,
+      "VelVientoMax": 14.3,
+      "HorMinVelMax": 1319,
+      "DirVientoVelMax": 143.5,
+      "Radiacion": 2.735,
+      "Precipitacion": 11.2,
+      "TempSuelo1": null,
+      "TempSuelo2": null,
+      "EtPMon": 0.914443,
+      "PePMon": 6.4613733,
+      "CodTempSuelo1": null,
+      "CodTempSuelo2": null
+    },
+    {
+      "Fecha": "2026-02-08T00:00:00",
+      "Estacion": "CC04",
+      "TempMedia": 9.32,
+      "TempMax": 13.2,
+      "HorMinTempMax": 1220,
+      "TempMin": 5.807,
+      "HorMinTempMin": 530,
+      "HumedadMedia": 79.1,
+      "HumedadMax": 100.0,
+      "HorMinHumMax": 2340,
+      "humedadMin": 52.67,
+      "HorMinHumMin": 1250,
+      "VelViento": 2.332,
+      "DirViento": 240.7,
+      "VelVientoMax": 7.48,
+      "HorMinVelMax": 220,
+      "DirVientoVelMax": 286.1,
+      "Radiacion": 10.34,
+      "Precipitacion": 3.3,
+      "TempSuelo1": null,
+      "TempSuelo2": null,
+      "EtPMon": 1.5176195,
+      "PePMon": 0.43073285,
+      "CodTempSuelo1": null,
+      "CodTempSuelo2": null
+    },
+    {
+      "Fecha": "2026-02-09T00:00:00",
+      "Estacion": "CC04",
+      "TempMedia": 11.14,
+      "TempMax": 14.25,
+      "HorMinTempMax": 2150,
+      "TempMin": 8.69,
+      "HorMinTempMin": 500,
+      "HumedadMedia": 99.6,
+      "HumedadMax": 100.0,
+      "HorMinHumMax": 2100,
+      "humedadMin": 97.0,
+      "HorMinHumMin": 40,
+      "VelViento": 0.743,
+      "DirViento": 30.18,
+      "VelVientoMax": 5.067,
+      "HorMinVelMax": 31,
+      "DirVientoVelMax": 150.5,
+      "Radiacion": 2.791,
+      "Precipitacion": 2.2,
+      "TempSuelo1": null,
+      "TempSuelo2": null,
+      "EtPMon": 0.5837945,
+      "PePMon": 0.0,
+      "CodTempSuelo1": null,
+      "CodTempSuelo2": null
+    }
+  ],
+  "MensajeRespuesta": null
 }
-```
-
-Fetch Daily Data
-
-```typescript
-const dailyData = await client.fetchDailyData(Scope.Station, {
-  ids: ["ALM01"],
-  startDate: "2024-01-01",
-  endDate: "2024-01-31",
-});
-
-if (dailyData.data) {
-  dailyData.data.forEach((day) => {
-    console.log(`Date: ${day.date}`);
-    console.log(`Avg Temperature: ${day.avgTemperature}°C`);
-    console.log(`Max/Min: ${day.maxTemperature}°C / ${day.minTemperature}°C`);
-    console.log(`Precipitation: ${day.precipitation}mm`);
-    console.log(`ET (Penman-Monteith): ${day.etPenmanMonteith}mm`);
-  });
-}
-```
-
-Fetch Weekly Data
-
-```typescript
-const weeklyData = await client.fetchWeeklyData(Scope.Province, {
-  ids: ["04"], // Province code
-  startDate: "2024-01-01",
-  endDate: "2024-03-31",
-});
-
-if (weeklyData.data) {
-  weeklyData.data.forEach((week) => {
-    console.log(`Year: ${week.year}, Week: ${week.week}`);
-    console.log(`Avg Temperature: ${week.avgTemperature}°C`);
-    console.log(`Total Precipitation: ${week.precipitation}mm`);
-  });
-}
-```
-
-Fetch Monthly Data
-
-```typescript
-const monthlyData = await client.fetchMonthlyData(Scope.AutonomousCommunity, {
-  ids: ["01"], // Autonomous community code
-  startDate: "2024-01-01",
-  endDate: "2024-12-31",
-});
-
-if (monthlyData.data) {
-  monthlyData.data.forEach((month) => {
-    console.log(`Year: ${month.year}, Month: ${month.month}`);
-    console.log(`Days: ${month.numDays}`);
-    console.log(`Avg Temperature: ${month.avgTemperature}°C`);
-    console.log(`Total Precipitation: ${month.precipitation}mm`);
-  });
-}
-```
-
-Query by Different Scopes
-The client supports three different scopes:
-
-```typescript
-import { Scope } from "siar-client";
-
-// By Station
-await client.fetchDailyData(Scope.Station, {
-  ids: ["Station code 1", "Station code 2"],
-  startDate: "2024-01-01",
-  endDate: "2024-01-31",
-});
-
-// By Province
-await client.fetchDailyData(Scope.Province, {
-  ids: ["Province code"],
-  startDate: "2024-01-01",
-  endDate: "2024-01-31",
-});
-
-// By Autonomous Community
-await client.fetchDailyData(Scope.AutonomousCommunity, {
-  ids: ["AC Code"],
-  startDate: "2024-01-01",
-  endDate: "2024-01-31",
-});
-```
-
-Using Last Modified Date Filter.
-
-This parameter is entirely optional: when included in the request, only data that has been updated within the interval defined by the StartDate and EndDate parameters from the date indicated by the parameter will be retrieved.
-
-```typescript
-const data = await client.fetchDailyData(Scope.Station, {
-  ids: ["ALM01"],
-  startDate: "2024-01-01",
-  endDate: "2024-01-31",
-  lastModifiedDate: "2024-01-15", // Optional: only get data modified after this date
-});
 ```

@@ -51,7 +51,7 @@ describe("DataPetitionService Integration", () => {
     const weekly = await service.fetchWeeklyData(Scope.Province, basicParams);
     const monthly = await service.fetchMonthlyData(
       Scope.AutonomousCommunity,
-      basicParams
+      basicParams,
     );
 
     // Basic shape checks without relying on mappers directly
@@ -78,10 +78,10 @@ describe("DataPetitionService Integration", () => {
     });
 
     const urls = global.fetch.mock.calls.map((c) => c[0]);
-    expect(urls[0]).toContain("Datos/Horarios/Estacion");
-    expect(urls[1]).toContain("Datos/Diarios/Provincia");
-    expect(urls[2]).toContain("Datos/Semanales/Provincia");
+    expect(urls[0]).toContain("Datos/Horarios/ESTACION");
+    expect(urls[1]).toContain("Datos/Diarios/PROVINCIA");
+    expect(urls[2]).toContain("Datos/Semanales/PROVINCIA");
     expect(urls[3]).toContain("Datos/Mensuales/CCAA");
-    urls.forEach((u) => expect(u).toContain(`ClaveAPI=${mockApiKey}`));
+    urls.forEach((u) => expect(u).toContain(`token=${mockApiKey}`));
   });
 });
