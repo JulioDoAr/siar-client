@@ -8,12 +8,14 @@ import type {
 import type {
   HourlyData,
   DailyData,
+  Daily2Data,
   WeeklyData,
   MonthlyData,
 } from "../index.js";
 import type {
   DatoHorario,
   DatoDiario,
+  DatoDiario2,
   DatoSemanal,
   DatoMensual,
 } from "../internal/data/Models.js";
@@ -76,6 +78,30 @@ export function mapDatoDiarioToDailyData(dato: DatoDiario): DailyData {
     date: dato.Fecha,
     provinceId: dato.IdProvincia,
     stationId: dato.IdEstacion,
+  };
+}
+
+/**
+ * Maps DatoDiario2 to Daily2Data
+ */
+export function mapDatoDiario2ToDaily2Data(dato: DatoDiario2): Daily2Data {
+  return {
+    provinceId: dato.IdProvincia,
+    stationId: dato.IdEstacion,
+    year: dato.Año,
+    dayOfYear: dato.Dia,
+    calms: dato.Calmas,
+    nonCalms: dato.NoCalmas,
+    temp40to30: dato.Temp_40a_30,
+    temp30to20: dato.Temp_30a_20,
+    temp20to10: dato.Temp_20a_10,
+    temp10to0: dato.Temp_10a_0,
+    temp0to10: dato.Temp_0a_10,
+    temp10to20: dato.Temp_10a_20,
+    temp20to30: dato.Temp_20a_30,
+    temp30to40: dato.Temp_30a_40,
+    temp40to50: dato.Temp_40a_50,
+    temp50to60: dato.Temp_50a_60,
   };
 }
 

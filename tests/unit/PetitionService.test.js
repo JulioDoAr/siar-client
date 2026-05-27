@@ -4,6 +4,7 @@ import { DataType, Scope } from "../../src/public/data/Models.js";
 import {
   mapDatoHorarioToHourlyData,
   mapDatoDiarioToDailyData,
+  mapDatoDiario2ToDaily2Data,
   mapDatoSemanalToWeeklyData,
   mapDatoMensualToMonthlyData,
 } from "../../src/mappers/Mappers.js";
@@ -200,6 +201,55 @@ describe("DataPetitionService", () => {
       expect(result.data).toBeUndefined();
       expect(result.message).toBe(
         "La Fecha Inicial de consulta proporcionada es inferior a la Fecha Mínima Inicial autorizada /api/datos/tipodatos/ámbitodatos?token&id&FechaInicial&FechaFinal",
+      );
+    });
+  });
+
+  describe("fetchDaily2Data", () => {
+    it("should use DataType.Daily2 value as Diarios2", () => {
+      expect(DataType.Daily2).toBe("Diarios2");
+    });
+
+    it("should route requests to Datos/Diarios2 endpoint", async () => {
+      const mockDaily2Response = {
+        datos: [
+          {
+            IdProvincia: 41,
+            IdEstacion: "SE001",
+            Año: 2024,
+            Dia: 120,
+            Calmas: 4,
+            NoCalmas: 20,
+            Temp_40a_30: 0,
+            Temp_30a_20: 2,
+            Temp_20a_10: 5,
+            Temp_10a_0: 1,
+            Temp_0a_10: 6,
+            Temp_10a_20: 7,
+            Temp_20a_30: 3,
+            Temp_30a_40: 0,
+            Temp_40a_50: 0,
+            Temp_50a_60: 0,
+          },
+        ],
+        MensajeRespuesta: null,
+      };
+
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => mockDaily2Response,
+      });
+
+      const result = await service.fetchDaily2Data(Scope.Station, basicParams);
+
+      expect(result).toEqual({
+        data: mockDaily2Response.datos.map(mapDatoDiario2ToDaily2Data),
+        message: mockDaily2Response.MensajeRespuesta,
+      });
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining("Diarios2/ESTACION"),
+        expect.any(Object),
       );
     });
   });

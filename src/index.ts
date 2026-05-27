@@ -1,6 +1,7 @@
 export type {
   HourlyData,
   DailyData,
+  Daily2Data,
   WeeklyData,
   MonthlyData,
 } from "./public/data/Models.js";

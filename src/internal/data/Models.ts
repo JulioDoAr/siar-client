@@ -87,6 +87,44 @@ export interface DatoDiario {
 }
 
 /**
+ * Datos diarios2
+ */
+export interface DatoDiario2 {
+  /** ID numérico que identifica a la provincia */
+  IdProvincia: number;
+  /** Código identificador de la estación */
+  IdEstacion: string;
+  /** Año del registro */
+  Año: number;
+  /** Día del año (1-365/366) */
+  Dia: number;
+  /** Observaciones horarias sin viento */
+  Calmas: number;
+  /** Observaciones horarias con viento (> 0) */
+  NoCalmas: number;
+  /** Horas con temperatura entre 40 °C y 30 °C */
+  Temp_40a_30: number;
+  /** Horas con temperatura entre 30 °C y 20 °C */
+  Temp_30a_20: number;
+  /** Horas con temperatura entre 20 °C y 10 °C */
+  Temp_20a_10: number;
+  /** Horas con temperatura entre 10 °C y 0 °C */
+  Temp_10a_0: number;
+  /** Horas con temperatura entre 0 °C y 10 °C */
+  Temp_0a_10: number;
+  /** Horas con temperatura entre 10 °C y 20 °C */
+  Temp_10a_20: number;
+  /** Horas con temperatura entre 20 °C y 30 °C */
+  Temp_20a_30: number;
+  /** Horas con temperatura entre 30 °C y 40 °C */
+  Temp_30a_40: number;
+  /** Horas con temperatura entre 40 °C y 50 °C */
+  Temp_40a_50: number;
+  /** Horas con temperatura entre 50 °C y 60 °C */
+  Temp_50a_60: number;
+}
+
+/**
  * Datos semanales
  */
 export interface DatoSemanal {

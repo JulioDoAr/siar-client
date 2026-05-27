@@ -4,6 +4,7 @@
 export enum DataType {
   Hourly = "Horarios",
   Daily = "Diarios",
+  Daily2 = "Diarios2",
   Weekly = "Semanales",
   Monthly = "Mensuales",
 }
@@ -103,6 +104,44 @@ export interface DailyData {
   provinceId: number;
   /** Station ID */
   stationId: number;
+}
+
+/**
+ * Daily2 data
+ */
+export interface Daily2Data {
+  /** Province ID */
+  provinceId: number;
+  /** Station identifier code */
+  stationId: string;
+  /** Record year */
+  year: number;
+  /** Day of year (1-365/366) */
+  dayOfYear: number;
+  /** Hourly observations without wind */
+  calms: number;
+  /** Hourly observations with wind (> 0) */
+  nonCalms: number;
+  /** Hours with temperature between 40 °C and 30 °C */
+  temp40to30: number;
+  /** Hours with temperature between 30 °C and 20 °C */
+  temp30to20: number;
+  /** Hours with temperature between 20 °C and 10 °C */
+  temp20to10: number;
+  /** Hours with temperature between 10 °C and 0 °C */
+  temp10to0: number;
+  /** Hours with temperature between 0 °C and 10 °C */
+  temp0to10: number;
+  /** Hours with temperature between 10 °C and 20 °C */
+  temp10to20: number;
+  /** Hours with temperature between 20 °C and 30 °C */
+  temp20to30: number;
+  /** Hours with temperature between 30 °C and 40 °C */
+  temp30to40: number;
+  /** Hours with temperature between 40 °C and 50 °C */
+  temp40to50: number;
+  /** Hours with temperature between 50 °C and 60 °C */
+  temp50to60: number;
 }
 
 /**

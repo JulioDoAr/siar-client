@@ -2,6 +2,7 @@ import { BASE_URL } from "../../internal/Consts.js";
 import type {
   DatoHorario,
   DatoDiario,
+  DatoDiario2,
   DatoSemanal,
   DatoMensual,
 } from "../../internal/data/Models.js";
@@ -9,6 +10,7 @@ import type { RespuestaGeneral } from "../../internal/Models.js";
 import {
   mapDatoHorarioToHourlyData,
   mapDatoDiarioToDailyData,
+  mapDatoDiario2ToDaily2Data,
   mapDatoSemanalToWeeklyData,
   mapDatoMensualToMonthlyData,
 } from "../../mappers/Mappers.js";
@@ -17,6 +19,7 @@ import {
   DataType,
   type HourlyData,
   type DailyData,
+  type Daily2Data,
   type WeeklyData,
   type MonthlyData,
 } from "../../public/data/Models.js";
@@ -196,6 +199,37 @@ export class DataPetitionService {
     }
 
     const mappedData = response.datos.map(mapDatoDiarioToDailyData);
+
+    return {
+      data: mappedData,
+      message: response.MensajeRespuesta,
+    };
+  }
+
+  /**
+   * Obtiene datos diarios2
+   * @param ambito Ámbito de la petición (CCAA, Provincia, Estacion)
+   * @param params Parámetros de la petición
+   * @returns Promesa con los datos diarios2
+   */
+  async fetchDaily2Data(
+    ambito: Scope,
+    params: DataPetitionParams,
+  ): Promise<GeneralResponse<Daily2Data[]>> {
+    const response = await this.fetchData<DatoDiario2[]>(
+      DataType.Daily2,
+      ambito,
+      params,
+    );
+
+    // If there's no datos field, return only the message (error case)
+    if (!response.datos) {
+      return {
+        message: response.MensajeRespuesta,
+      };
+    }
+
+    const mappedData = response.datos.map(mapDatoDiario2ToDaily2Data);
 
     return {
       data: mappedData,

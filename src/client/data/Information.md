@@ -11,7 +11,7 @@ Este servicio permite consultar datos agroclimáticos en función del ámbito de
 
 | Nombre | Obligatorio | Descripción |
 |--------|-------------|-------------|
-| tipoDatos | Sí | Define el tipo de datos solicitado. Admite uno de los siguientes valores:<br>• `Horarios`<br>• `Diarios`<br>• `Semanales`<br>• `Mensuales` |
+| tipoDatos | Sí | Define el tipo de datos solicitado. Admite uno de los siguientes valores:<br>• `Horarios`<br>• `Diarios`<br>• `Diarios2`<br>• `Semanales`<br>• `Mensuales` |
 | ambito | Sí | Determina el ámbito de consulta de los datos. Admite uno de los siguientes valores:<br>• `CCAA`<br>• `PROVINCIA`<br>• `ESTACION` |
 
 ## Parámetros de consulta
@@ -132,6 +132,27 @@ El servicio permitirá buscar los datos diarios de las integrales térmicas y ca
 | Temp_30a_40 | Integer | Número de horas con temperatura entre 30 °C y 40 °C. |
 | Temp_40a_50 | Integer | Número de horas con temperatura entre 40 °C y 50 °C. |
 | Temp_50a_60 | Integer | Número de horas con temperatura entre 50 °C y 60 °C. |
+
+## Decision de contrato Diarios2 (Tarea 1)
+
+Decision funcional confirmada para la libreria:
+
+- Nombre de tipo publico: `Daily2Data`.
+- Nombre de metodo publico: `fetchDaily2Data`.
+- Valor de ruta para `tipoDatos`: `Diarios2`.
+- Ambitos admitidos: `CCAA`, `PROVINCIA`, `ESTACION`.
+- Parametros de consulta: mismos que en `Datos` (`token`, `Id`, `FechaInicial`, `FechaFinal`, `FechaUltModificacion`, `DatosCalculados`).
+
+Supuesto explicito por ambiguedad del manual:
+
+- Aunque en la tabla de "Parametros de ruta" no aparece `Diarios2`, se adopta como contrato valido porque SI aparece definido en "Valores de salida".
+- Se mantiene `DatosCalculados` como parametro opcional de paso (sin asumir efecto funcional especifico para `Diarios2`).
+
+Casos minimos esperados para payload `Diarios2`:
+
+1. Respuesta con `datos` no vacio y todos los campos documentados (`IdProvincia`, `IdEstacion`, `Año`, `Dia`, `Calmas`, `NoCalmas`, `Temp_40a_30` ... `Temp_50a_60`) con tipos correctos.
+2. Respuesta con `datos` vacio y `MensajeRespuesta` nulo o informativo, sin error de parseo.
+3. Construccion de URL final con `tipoDatos=Diarios2` y serializacion repetible de `Id` (`...&Id={id1}&Id={id2}`).
 
 ---
 

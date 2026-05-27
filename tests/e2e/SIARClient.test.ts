@@ -8,18 +8,17 @@ import type {
 import type { GeneralResponse } from "../../src/public/Models.js";
 import type { DataPetitionParams } from "../../src/index.js";
 
-describe("SIARClient", () => {
+const hasApiKey = Boolean(process.env.SIAR_API_KEY);
+const describeIfApiKey = hasApiKey ? describe : describe.skip;
+
+describeIfApiKey("SIARClient", () => {
   let service: SIARClient;
   let communities: GeneralResponse<AutonomousCommunity[]>;
   let provinces: GeneralResponse<Province[]>;
   let stations: GeneralResponse<Station[]>;
 
   beforeAll(() => {
-    const apiKey = process.env.SIAR_API_KEY;
-    if (!apiKey) {
-      throw new Error("SIAR_API_KEY not set");
-    }
-    service = new SIARClient(apiKey);
+    service = new SIARClient(process.env.SIAR_API_KEY as string);
   });
 
   it("should fetch real autonomous communities", async () => {
